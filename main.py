@@ -45,6 +45,8 @@ def main_gui(entity_type_name):
         root.destroy()
         main_menu()
 
+    Button(root, text="⟵ ", command=go_back).grid(row=0, column=0, sticky="nw", padx=5, pady=5)
+
     def add_entity():
         name = entry_name.get()
         surname = entry_surname.get()
