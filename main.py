@@ -23,6 +23,28 @@ def get_coordinates(city):
         print(f"Błąd pobierania współrzędnych: {e}")
         return [52.23, 21.01]  # Warszawa domyślnie
 
+# --- KLASA OBIEKTU (np. pracownik/klient/biblioteka) --- #
+class Entity:
+    def __init__(self, name, surname, city, extra_info):
+        self.name = name
+        self.surname = surname
+        self.city = city
+        self.extra_info = extra_info
+        self.coordinates = get_coordinates(city)
+        self.marker = None
+
+# --- GUI GŁÓWNEGO PANELU ZARZĄDZANIA --- #
+def main_gui(entity_type_name):
+    global map_widget
+
+    root = Tk()
+    root.title(f"{entity_type_name} – {current_city}")
+    root.geometry("1024x768")
+
+    def go_back():
+        root.destroy()
+        main_menu()
+
 # --- GUI GŁÓWNEGO PANELU --- #
 def main_gui(entity_type_name):
     global map_widget
@@ -36,6 +58,16 @@ def main_gui(entity_type_name):
     def go_back():
         root.destroy()
         main_menu()
+# --- MENU WYBORU FUNKCJI --- #
+def main_menu():
+    root = Tk()
+    root.title(f"Wybierz tryb – {current_city}")
+    root.geometry("300x200")
+    Label(root, text="Wybierz, czym chcesz zarządzać:").pack(pady=20)
+    Button(root, text="Biblioteki", command=lambda: [root.destroy(), main_gui("Biblioteki")]).pack(fill=X, padx=40, pady=5)
+    Button(root, text="Pracownicy", command=lambda: [root.destroy(), main_gui("Pracownicy")]).pack(fill=X, padx=40, pady=5)
+    Button(root, text="Klienci", command=lambda: [root.destroy(), main_gui("Klienci")]).pack(fill=X, padx=40, pady=5)
+    root.mainloop()
 
 # --- START APLIKACJI (WYBÓR MIASTA) --- #
 def start_app():
