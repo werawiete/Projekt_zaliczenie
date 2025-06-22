@@ -97,7 +97,10 @@ def main_gui(entity_type_name):
     def show_list():
         listbox.delete(0, END)
         for idx, obj in enumerate(data):
-            listbox.insert(idx, f"{obj.name} {obj.surname} ({obj.city})")
+            if entity_type_name == "Biblioteki":
+                listbox.insert(idx, f"{obj.name} ({obj.city}) – {obj.surname} książek")
+            else:
+                listbox.insert(idx, f"{obj.name} {obj.surname} ({obj.city})")
 
     def clear_form():
         entry_name.delete(0, END)
@@ -146,12 +149,28 @@ def main_gui(entity_type_name):
     Button(ramka_lista, text="Usuń obiekt", command=delete_entity).grid(row=2, column=2)
 
     Label(ramka_formularz, text="Formularz:").grid(row=0, column=0, columnspan=2)
-    Label(ramka_formularz, text="Imię:").grid(row=1, column=0, sticky=W)
+    label_name = "Nazwa biblioteki:" if entity_type_name == "Biblioteki" else "Imię:"
+    label_surname = "Liczba książek:" if entity_type_name == "Biblioteki" else "Nazwisko:"
+
+    Label(ramka_formularz, text=label_name).grid(row=1, column=0, sticky=W)
     entry_name = Entry(ramka_formularz)
     entry_name.grid(row=1, column=1)
-    Label(ramka_formularz, text="Nazwisko:").grid(row=2, column=0, sticky=W)
+
+    Label(ramka_formularz, text=label_surname).grid(row=2, column=0, sticky=W)
     entry_surname = Entry(ramka_formularz)
     entry_surname.grid(row=2, column=1)
+    Label(ramka_szczegoly, text="Nazwa:").grid(row=1, column=0)
+    label_val_name = Label(ramka_szczegoly, text="....")
+    label_val_name.grid(row=1, column=1)
+
+    Label(ramka_szczegoly, text="Info:").grid(row=1, column=2)
+    label_val_surname = Label(ramka_szczegoly, text="....")
+    label_val_surname.grid(row=1, column=3)
+    #entry_name = Entry(ramka_formularz)
+    #entry_name.grid(row=1, column=1)
+    #Label(ramka_formularz, text="Nazwisko:").grid(row=2, column=0, sticky=W)
+    #entry_surname = Entry(ramka_formularz)
+    #entry_surname.grid(row=2, column=1)
     Label(ramka_formularz, text="Miasto:").grid(row=3, column=0, sticky=W)
     entry_city = Entry(ramka_formularz)
     entry_city.grid(row=3, column=1)
@@ -163,12 +182,17 @@ def main_gui(entity_type_name):
     btn_add.grid(row=5, column=0, columnspan=2)
 
     Label(ramka_szczegoly, text="Szczegóły użytkownika:").grid(row=0, column=0, sticky=W)
-    Label(ramka_szczegoly, text="Imię:").grid(row=1, column=0)
-    label_val_name = Label(ramka_szczegoly, text="....")
-    label_val_name.grid(row=1, column=1)
-    Label(ramka_szczegoly, text="Nazwisko:").grid(row=1, column=2)
-    label_val_surname = Label(ramka_szczegoly, text="....")
-    label_val_surname.grid(row=1, column=3)
+    label_det_name = "Nazwa biblioteki:" if entity_type_name == "Biblioteki" else "Imię:"
+    label_det_surname = "Liczba książek:" if entity_type_name == "Biblioteki" else "Nazwisko:"
+
+    Label(ramka_szczegoly, text=label_det_name).grid(row=1, column=0)
+    Label(ramka_szczegoly, text=label_det_surname).grid(row=1, column=2)
+    #Label(ramka_szczegoly, text="Imię:").grid(row=1, column=0)
+    #label_val_name = Label(ramka_szczegoly, text="....")
+    #label_val_name.grid(row=1, column=1)
+    #Label(ramka_szczegoly, text="Nazwisko:").grid(row=1, column=2)
+    #label_val_surname = Label(ramka_szczegoly, text="....")
+    #label_val_surname.grid(row=1, column=3)
     Label(ramka_szczegoly, text="Miasto:").grid(row=1, column=4)
     label_val_city = Label(ramka_szczegoly, text="....")
     label_val_city.grid(row=1, column=5)
