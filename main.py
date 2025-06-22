@@ -36,6 +36,7 @@ class Entity:
 # --- GUI GŁÓWNEGO PANELU ZARZĄDZANIA --- #
 def main_gui(entity_type_name):
     global map_widget
+    selected_index = [None]
 
     root = Tk()
     root.title(f"{entity_type_name} – {current_city}")
@@ -50,7 +51,7 @@ def main_gui(entity_type_name):
     def add_entity():
         name = entry_name.get()
         surname = entry_surname.get()
-        city = city_combobox.get()
+        city = entry_city.get()
         extra = entry_extra.get()
         if not name or not city:
             return
@@ -86,7 +87,8 @@ def main_gui(entity_type_name):
         entry_name.insert(0, obj.name)
         entry_surname.delete(0, END)
         entry_surname.insert(0, obj.surname)
-        city_combobox.set(obj.city)
+        entry_city.delete(0, END)
+        entry_city.insert(0, obj.city)
         entry_extra.delete(0, END)
         entry_extra.insert(0, obj.extra_info)
         selected_index[0] = idx
@@ -100,7 +102,7 @@ def main_gui(entity_type_name):
     def clear_form():
         entry_name.delete(0, END)
         entry_surname.delete(0, END)
-        city_combobox.set(cities[0])
+        entry_city.delete(0, END)
         entry_extra.delete(0, END)
         selected_index[0] = None
         btn_add.config(text="Dodaj")
@@ -151,9 +153,9 @@ def main_gui(entity_type_name):
     entry_surname = Entry(ramka_formularz)
     entry_surname.grid(row=2, column=1)
     Label(ramka_formularz, text="Miasto:").grid(row=3, column=0, sticky=W)
-    city_combobox = ttk.Combobox(ramka_formularz, values=cities, state="readonly")
-    city_combobox.grid(row=3, column=1)
-    city_combobox.set(current_city)
+    entry_city = Entry(ramka_formularz)
+    entry_city.grid(row=3, column=1)
+    entry_city.insert(0, current_city)
     Label(ramka_formularz, text="Dodatkowe info:").grid(row=4, column=0, sticky=W)
     entry_extra = Entry(ramka_formularz)
     entry_extra.grid(row=4, column=1)
