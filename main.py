@@ -30,6 +30,7 @@ class Entity:
         self.surname = surname
         self.city = city
         self.extra_info = extra_info
+        self.parent_library = parent_library
         self.coordinates = get_coordinates(city)
         self.marker = None
 
@@ -53,6 +54,7 @@ def main_gui(entity_type_name):
         surname = entry_surname.get()
         city = entry_city.get()
         extra = entry_extra.get()
+        parent_lib = entry_library.get()
         if not name or not city:
             return
 
@@ -63,6 +65,7 @@ def main_gui(entity_type_name):
             obj.surname = surname
             obj.city = city
             obj.extra_info = extra
+            obj.parent_library = parent_lib
             obj.coordinates = get_coordinates(city)
             if obj.marker:
                 obj.marker.delete()
@@ -91,13 +94,18 @@ def main_gui(entity_type_name):
         entry_city.insert(0, obj.city)
         entry_extra.delete(0, END)
         entry_extra.insert(0, obj.extra_info)
+        entry_library.delete(0, END)
+        entry_library.insert(0, obj.parent_library)
         selected_index[0] = idx
         btn_add.config(text="Zapisz zmiany")
 
     def show_list():
         listbox.delete(0, END)
         for idx, obj in enumerate(data):
-            listbox.insert(idx, f"{obj.name} {obj.surname} ({obj.city})")
+            if entity_type_name == "Biblioteki":
+                listbox.insert(idx, f"{obj.name} ({obj.city}) – {obj.surname} książek")
+            else:
+                listbox.insert(idx, f"{obj.name} {obj.surname} ({obj.city})")
 
     def clear_form():
         entry_name.delete(0, END)
@@ -126,6 +134,53 @@ def main_gui(entity_type_name):
         show_list()
         clear_form()
 
+    def show_library_map():
+        target_library = entry_library.get().strip()
+        if not target_library:
+            messagebox.showwarning("Brak danych", "Wpisz nazwę biblioteki!")
+            return
+
+
+
+            # nowe okno
+            map_window = Toplevel(root)
+            map_window.title(f"Mapa - {entity_type_name} w '{target_library}'")
+            map_window.geometry("1000x600")
+
+            map_view = tkintermapview.TkinterMapView(map_window, width=1000, height=600)
+            map_view.pack(fill=BOTH, expand=True)
+
+            map_view.set_position(*get_coordinates(current_city))
+            map_view.set_zoom(7)
+
+            found = False
+            for obj in data:
+                if obj.parent_library == target_library:
+                    map_view.set_marker(*obj.coordinates, text=f"{obj.name} {obj.surname}")
+                    found = True
+
+            if not found:
+                messagebox.showinfo("Brak wyników", f"Brak {entity_type_name.lower()} w tej bibliotece!")
+        # nowe okno
+        map_window = Toplevel(root)
+        map_window.title(f"Mapa - {entity_type_name} w '{target_library}'")
+        map_window.geometry("1000x600")
+
+        map_view = tkintermapview.TkinterMapView(map_window, width=1000, height=600)
+        map_view.pack(fill=BOTH, expand=True)
+
+        map_view.set_position(*get_coordinates(current_city))
+        map_view.set_zoom(7)
+
+        found = False
+        for obj in data:
+            if obj.parent_library == target_library:
+                map_view.set_marker(*obj.coordinates, text=f"{obj.name} {obj.surname}")
+                found = True
+
+        if not found:
+            messagebox.showinfo("Brak wyników", f"Brak {entity_type_name.lower()} w tej bibliotece!")
+
     # Layout
 
     ramka_lista = Frame(root)
@@ -145,13 +200,32 @@ def main_gui(entity_type_name):
     Button(ramka_lista, text="Edytuj obiekt", command=edit_entity).grid(row=2, column=1)
     Button(ramka_lista, text="Usuń obiekt", command=delete_entity).grid(row=2, column=2)
 
+    if entity_type_name != "Biblioteki":
+        Button(ramka_formularz, text="Pokaż mapę tej biblioteki", command=show_library_map).grid(row=7, column=0,
+                                                                                                 columnspan=2, pady=5)
     Label(ramka_formularz, text="Formularz:").grid(row=0, column=0, columnspan=2)
-    Label(ramka_formularz, text="Imię:").grid(row=1, column=0, sticky=W)
+    label_name = "Nazwa biblioteki:" if entity_type_name == "Biblioteki" else "Imię:"
+    label_surname = "Liczba książek:" if entity_type_name == "Biblioteki" else "Nazwisko:"
+
+    Label(ramka_formularz, text=label_name).grid(row=1, column=0, sticky=W)
     entry_name = Entry(ramka_formularz)
     entry_name.grid(row=1, column=1)
-    Label(ramka_formularz, text="Nazwisko:").grid(row=2, column=0, sticky=W)
+
+    Label(ramka_formularz, text=label_surname).grid(row=2, column=0, sticky=W)
     entry_surname = Entry(ramka_formularz)
     entry_surname.grid(row=2, column=1)
+    Label(ramka_szczegoly, text="Nazwa:").grid(row=1, column=0)
+    label_val_name = Label(ramka_szczegoly, text="....")
+    label_val_name.grid(row=1, column=1)
+
+    Label(ramka_szczegoly, text="Info:").grid(row=1, column=2)
+    label_val_surname = Label(ramka_szczegoly, text="....")
+    label_val_surname.grid(row=1, column=3)
+    #entry_name = Entry(ramka_formularz)
+    #entry_name.grid(row=1, column=1)
+    #Label(ramka_formularz, text="Nazwisko:").grid(row=2, column=0, sticky=W)
+    #entry_surname = Entry(ramka_formularz)
+    #entry_surname.grid(row=2, column=1)
     Label(ramka_formularz, text="Miasto:").grid(row=3, column=0, sticky=W)
     entry_city = Entry(ramka_formularz)
     entry_city.grid(row=3, column=1)
@@ -159,22 +233,37 @@ def main_gui(entity_type_name):
     Label(ramka_formularz, text="Dodatkowe info:").grid(row=4, column=0, sticky=W)
     entry_extra = Entry(ramka_formularz)
     entry_extra.grid(row=4, column=1)
+    if entity_type_name != "Biblioteki":
+        Label(ramka_formularz, text="Biblioteka:").grid(row=5, column=0, sticky=W)
+        entry_library = Entry(ramka_formularz)
+        entry_library.grid(row=5, column=1)
+    else:
+        entry_library = Entry(ramka_formularz)
+        entry_library.grid_forget()
     btn_add = Button(ramka_formularz, text="Dodaj", command=add_entity)
-    btn_add.grid(row=5, column=0, columnspan=2)
+    btn_add.grid(row=6, column=0, columnspan=2)
 
     Label(ramka_szczegoly, text="Szczegóły użytkownika:").grid(row=0, column=0, sticky=W)
-    Label(ramka_szczegoly, text="Imię:").grid(row=1, column=0)
-    label_val_name = Label(ramka_szczegoly, text="....")
-    label_val_name.grid(row=1, column=1)
-    Label(ramka_szczegoly, text="Nazwisko:").grid(row=1, column=2)
-    label_val_surname = Label(ramka_szczegoly, text="....")
-    label_val_surname.grid(row=1, column=3)
+    label_det_name = "Nazwa biblioteki:" if entity_type_name == "Biblioteki" else "Imię:"
+    label_det_surname = "Liczba książek:" if entity_type_name == "Biblioteki" else "Nazwisko:"
+
+    Label(ramka_szczegoly, text=label_det_name).grid(row=1, column=0)
+    Label(ramka_szczegoly, text=label_det_surname).grid(row=1, column=2)
+    #Label(ramka_szczegoly, text="Imię:").grid(row=1, column=0)
+    #label_val_name = Label(ramka_szczegoly, text="....")
+    #label_val_name.grid(row=1, column=1)
+    #Label(ramka_szczegoly, text="Nazwisko:").grid(row=1, column=2)
+    #label_val_surname = Label(ramka_szczegoly, text="....")
+    #label_val_surname.grid(row=1, column=3)
     Label(ramka_szczegoly, text="Miasto:").grid(row=1, column=4)
     label_val_city = Label(ramka_szczegoly, text="....")
     label_val_city.grid(row=1, column=5)
     Label(ramka_szczegoly, text="Dodatkowe info:").grid(row=1, column=6)
     label_val_extra = Label(ramka_szczegoly, text="....")
     label_val_extra.grid(row=1, column=7)
+    Label(ramka_szczegoly, text="Biblioteka:").grid(row=1, column=8)
+    label_val_library = Label(ramka_szczegoly, text="....")
+    label_val_library.grid(row=1, column=9)
 
     map_widget = tkintermapview.TkinterMapView(ramka_mapa, width=1000, height=400)
     map_widget.set_position(*get_coordinates(current_city))
