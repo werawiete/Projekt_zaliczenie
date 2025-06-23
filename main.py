@@ -25,7 +25,7 @@ def get_coordinates(city):
 
 # --- KLASA OBIEKTU (np. pracownik/klient/biblioteka) --- #
 class Entity:
-    def __init__(self, name, surname, city, extra_info):
+    def __init__(self, name, surname, city, extra_info, parent_library=""):
         self.name = name
         self.surname = surname
         self.city = city
@@ -74,7 +74,7 @@ def main_gui(entity_type_name):
             btn_add.config(text="Dodaj")
         else:
             # Nowy obiekt
-            obj = Entity(name, surname, city, extra)
+            obj = Entity(name, surname, city, extra, parent_lib)
             obj.marker = map_widget.set_marker(*obj.coordinates, text=name)
             data.append(obj)
         show_list()
@@ -102,16 +102,17 @@ def main_gui(entity_type_name):
     def show_list():
         listbox.delete(0, END)
         for idx, obj in enumerate(data):
-            if entity_type_name == "Biblioteki":
+            if entity_type_name == "Biblioteki" and obj.parent_library is None:
                 listbox.insert(idx, f"{obj.name} ({obj.city}) – {obj.surname} książek")
             else:
-                listbox.insert(idx, f"{obj.name} {obj.surname} ({obj.city})")
+                listbox.insert(idx, f"{obj.name} {obj.surname} ({obj.city}) [{obj.parent_library}]")
 
     def clear_form():
         entry_name.delete(0, END)
         entry_surname.delete(0, END)
         entry_city.delete(0, END)
         entry_extra.delete(0, END)
+        entry_library.delete(0, END)
         selected_index[0] = None
         btn_add.config(text="Dodaj")
 
@@ -123,6 +124,7 @@ def main_gui(entity_type_name):
         label_val_surname.config(text=obj.surname)
         label_val_city.config(text=obj.city)
         label_val_extra.config(text=obj.extra_info)
+        label_val_library.config(text=obj.parent_library)
         map_widget.set_position(*obj.coordinates)
         map_widget.set_zoom(12)
 
@@ -161,25 +163,6 @@ def main_gui(entity_type_name):
 
             if not found:
                 messagebox.showinfo("Brak wyników", f"Brak {entity_type_name.lower()} w tej bibliotece!")
-        # nowe okno
-        map_window = Toplevel(root)
-        map_window.title(f"Mapa - {entity_type_name} w '{target_library}'")
-        map_window.geometry("1000x600")
-
-        map_view = tkintermapview.TkinterMapView(map_window, width=1000, height=600)
-        map_view.pack(fill=BOTH, expand=True)
-
-        map_view.set_position(*get_coordinates(current_city))
-        map_view.set_zoom(7)
-
-        found = False
-        for obj in data:
-            if obj.parent_library == target_library:
-                map_view.set_marker(*obj.coordinates, text=f"{obj.name} {obj.surname}")
-                found = True
-
-        if not found:
-            messagebox.showinfo("Brak wyników", f"Brak {entity_type_name.lower()} w tej bibliotece!")
 
     # Layout
 
@@ -216,8 +199,7 @@ def main_gui(entity_type_name):
     entry_surname.grid(row=2, column=1)
     Label(ramka_szczegoly, text="Nazwa:").grid(row=1, column=0)
     label_val_name = Label(ramka_szczegoly, text="....")
-    label_val_name.grid(row=1, column=1)
-
+    Label(ramka_szczegoly, text=label_name).grid(row=1, column=1)
     Label(ramka_szczegoly, text="Info:").grid(row=1, column=2)
     label_val_surname = Label(ramka_szczegoly, text="....")
     label_val_surname.grid(row=1, column=3)
