@@ -142,27 +142,25 @@ def main_gui(entity_type_name):
             messagebox.showwarning("Brak danych", "Wpisz nazwę biblioteki!")
             return
 
+         # nowe okno
+        map_window = Toplevel(root)
+        map_window.title(f"Mapa - {entity_type_name} w '{target_library}'")
+        map_window.geometry("1000x600")
 
+        map_view = tkintermapview.TkinterMapView(map_window, width=1000, height=600)
+        map_view.pack(fill=BOTH, expand=True)
 
-            # nowe okno
-            map_window = Toplevel(root)
-            map_window.title(f"Mapa - {entity_type_name} w '{target_library}'")
-            map_window.geometry("1000x600")
+        map_view.set_position(*get_coordinates(current_city))
+        map_view.set_zoom(7)
 
-            map_view = tkintermapview.TkinterMapView(map_window, width=1000, height=600)
-            map_view.pack(fill=BOTH, expand=True)
+        found = False
+        for obj in data:
+            if obj.parent_library == target_library:
+                map_view.set_marker(*obj.coordinates, text=f"{obj.name} {obj.surname}")
+                found = True
 
-            map_view.set_position(*get_coordinates(current_city))
-            map_view.set_zoom(7)
-
-            found = False
-            for obj in data:
-                if obj.parent_library == target_library:
-                    map_view.set_marker(*obj.coordinates, text=f"{obj.name} {obj.surname}")
-                    found = True
-
-            if not found:
-                messagebox.showinfo("Brak wyników", f"Brak {entity_type_name.lower()} w tej bibliotece!")
+        if not found:
+            messagebox.showinfo("Brak wyników", f"Brak {entity_type_name.lower()} w tej bibliotece!")
 
     # Layout
 
