@@ -250,7 +250,7 @@ def main_gui(entity_type_name, entity_data):
         label_val_library = Label(ramka_szczegoly, text="....")
         label_val_library.grid(row=1, column=9)
     else:
-        label_val_library = Label(ramka_szczegoly)  # niewidoczne, placeholder
+        label_val_library = Label(ramka_szczegoly)
 
     map_widget = tkintermapview.TkinterMapView(ramka_mapa, width=1000, height=400)
     map_widget.set_position(*get_coordinates(current_city))
