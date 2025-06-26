@@ -7,7 +7,9 @@ from bs4 import BeautifulSoup
 # --- GLOBALNE ZMIENNE --- #
 cities = ["Warszawa", "Kraków", "Gdańsk", "Wrocław", "Poznań"]
 current_city = None
-data = []
+libraries = []
+employees = []
+clients = []
 map_widget = None  # globalna mapa
 
 # --- FUNKCJA DO POBIERANIA KOORDYNATÓW Z WIKIPEDII --- #
@@ -35,9 +37,10 @@ class Entity:
         self.marker = None
 
 # --- GUI GŁÓWNEGO PANELU ZARZĄDZANIA --- #
-def main_gui(entity_type_name):
+def main_gui(entity_type_name, entity_data):
     global map_widget
     selected_index = [None]
+    data = entity_data
 
     root = Tk()
     root.title(f"{entity_type_name} – {current_city}")
@@ -195,9 +198,10 @@ def main_gui(entity_type_name):
     Label(ramka_formularz, text=label_surname).grid(row=2, column=0, sticky=W)
     entry_surname = Entry(ramka_formularz)
     entry_surname.grid(row=2, column=1)
-    Label(ramka_szczegoly, text="Nazwa:").grid(row=1, column=0)
+    Label(ramka_szczegoly, text=label_name).grid(row=1, column=0)
     label_val_name = Label(ramka_szczegoly, text="....")
-    Label(ramka_szczegoly, text=label_name).grid(row=1, column=1)
+    label_val_name.grid(row=1, column=1)
+
     Label(ramka_szczegoly, text="Info:").grid(row=1, column=2)
     label_val_surname = Label(ramka_szczegoly, text="....")
     label_val_surname.grid(row=1, column=3)
@@ -241,9 +245,12 @@ def main_gui(entity_type_name):
     Label(ramka_szczegoly, text="Dodatkowe info:").grid(row=1, column=6)
     label_val_extra = Label(ramka_szczegoly, text="....")
     label_val_extra.grid(row=1, column=7)
-    Label(ramka_szczegoly, text="Biblioteka:").grid(row=1, column=8)
-    label_val_library = Label(ramka_szczegoly, text="....")
-    label_val_library.grid(row=1, column=9)
+    if entity_type_name != "Biblioteki":
+        Label(ramka_szczegoly, text="Biblioteka:").grid(row=1, column=8)
+        label_val_library = Label(ramka_szczegoly, text="....")
+        label_val_library.grid(row=1, column=9)
+    else:
+        label_val_library = Label(ramka_szczegoly)  # niewidoczne, placeholder
 
     map_widget = tkintermapview.TkinterMapView(ramka_mapa, width=1000, height=400)
     map_widget.set_position(*get_coordinates(current_city))
@@ -259,9 +266,9 @@ def main_menu():
     root.title(f"Wybierz tryb – {current_city}")
     root.geometry("300x200")
     Label(root, text="Wybierz, czym chcesz zarządzać:").pack(pady=20)
-    Button(root, text="Biblioteki", command=lambda: [root.destroy(), main_gui("Biblioteki")]).pack(fill=X, padx=40, pady=5)
-    Button(root, text="Pracownicy", command=lambda: [root.destroy(), main_gui("Pracownicy")]).pack(fill=X, padx=40, pady=5)
-    Button(root, text="Klienci", command=lambda: [root.destroy(), main_gui("Klienci")]).pack(fill=X, padx=40, pady=5)
+    Button(root, text="Biblioteki", command=lambda: [root.destroy(), main_gui("Biblioteki", libraries)]).pack(fill=X, padx=40, pady=5)
+    Button(root, text="Pracownicy", command=lambda: [root.destroy(), main_gui("Pracownicy", employees)]).pack(fill=X, padx=40, pady=5)
+    Button(root, text="Klienci", command=lambda: [root.destroy(), main_gui("Klienci", clients)]).pack(fill=X, padx=40, pady=5)
     root.mainloop()
 
 
